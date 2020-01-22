@@ -2,6 +2,7 @@ package com.example.u1tema5;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,13 +20,14 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MiPolyLine  extends AppCompatActivity implements OnMapReadyCallback {
+public class MiPolyLine  extends AppCompatActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener {
     GoogleMap gMap;
     SeekBar seekwidth, seekazul, seekverde, seekrojo;
     Button btndibujar, btnlimpiar;
     Polyline polyline = null;
     List<LatLng> latLngList = new ArrayList<>();
     List<Marker> markerList = new ArrayList<>();
+    int rojo=0,verde=0,azul=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,11 @@ public class MiPolyLine  extends AppCompatActivity implements OnMapReadyCallback
                 PolylineOptions polylineOptions = new PolylineOptions()
                         .addAll(latLngList).clickable(true);//false: se puede poner un marcador sobre la linea
                 polyline = gMap.addPolyline(polylineOptions);
+                polyline.setColor(Color.rgb(rojo,verde,azul));
+                int Width = seekwidth.getProgress();
+                polyline.setWidth(Width);
+
+
             }
         });
         btnlimpiar.setOnClickListener(new View.OnClickListener() {
@@ -60,8 +67,13 @@ public class MiPolyLine  extends AppCompatActivity implements OnMapReadyCallback
                 seekazul.setProgress(0);
                 seekrojo.setProgress(0);
                 seekverde.setProgress(0);
+
             }
         });
+        seekazul.setOnSeekBarChangeListener(this);
+        seekrojo.setOnSeekBarChangeListener(this);
+        seekverde.setOnSeekBarChangeListener(this);
+        seekwidth.setOnSeekBarChangeListener(this);
     }
 
     @Override
@@ -76,5 +88,36 @@ public class MiPolyLine  extends AppCompatActivity implements OnMapReadyCallback
                 markerList.add(marker);
             }
         });
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        switch (seekBar.getId()){
+            case R.id.seek_rojo:
+                rojo=i;
+                break;
+            case R.id.seek_verde:
+                verde=i;
+                break;
+            case R.id.seek_azul:
+                azul=i;
+                break;
+            case R.id.seek_width:
+                if(polyline!=null)
+                    polyline.setWidth(i);
+                break;
+        }
+        if(polyline!=null)
+            polyline.setColor(Color.rgb(rojo, verde, azul));
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }
